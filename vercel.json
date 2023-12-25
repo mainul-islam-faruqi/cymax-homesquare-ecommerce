@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/sitemap-generator/create-index",
+      "schedule": "10 3 * * 0"
+    }
+  ]
+}

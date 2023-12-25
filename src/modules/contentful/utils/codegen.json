@@ -1,0 +1,31 @@
+{
+  "schema": {
+    "https://graphql.contentful.com/content/v1/spaces/${NEXT_PUBLIC_CONTENTFUL_SPACE_ID}/environments/${NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT}": {
+      "headers": {
+        "Authorization": "Bearer ${NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN}"
+      }
+    }
+  },
+  "documents": [
+    {
+      "./src/modules/contentful/utils/fragments/*.ts": {},
+      "./src/modules/contentful/utils/queries/*.ts": {}
+    }
+  ],
+  "generates": {
+    "./src/modules/contentful/utils/contentful-schema.ts": {
+      "plugins": ["typescript", "typescript-operations"],
+      "config": {
+        "scalars": {
+          "ID": "string"
+        }
+      }
+    },
+    "./src/modules/contentful/utils/contentful-schema.graphql": {
+      "plugins": ["schema-ast"]
+    }
+  },
+  "hooks": {
+    "afterAllFileWrite": ["prettier --write ."]
+  }
+}

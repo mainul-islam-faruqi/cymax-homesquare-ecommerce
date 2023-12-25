@@ -1,0 +1,242 @@
+{
+	"info": {
+		"_postman_id": "198e3e1b-0869-457f-969e-1c47dbc28120",
+		"name": "EP Wishlist Services",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Wishlist Entry",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const json = pm.response.json()",
+							"const d = json.hasOwnProperty(\"data\") ? json.data : json",
+							"const id = Array.isArray(d) ? d[0].access_token : d.id",
+							"pm.environment.set(\"WISHLIST_ENTRY_ID\", id)",
+							"",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.be.ok;",
+							"});",
+							"",
+							"pm.test(\"Environment variable test\", function () {",
+							"    pm.expect(pm.environment.get(\"accessToken\")).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "customerId",
+							"value": "{{SAMPLE_CUSTOMER_ID}}",
+							"type": "text"
+						},
+						{
+							"key": "siteId",
+							"value": "cymax",
+							"type": "text"
+						},
+						{
+							"key": "locale",
+							"value": "en/US",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/wishlists/create-entry",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"wishlists",
+						"create-entry"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Product to Wishlist",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "productEntryId",
+							"value": "{{SAMPLE_PRODUCT_ID}}",
+							"type": "text"
+						},
+						{
+							"key": "wishlistEntryId",
+							"value": "{{WISHLIST_ENTRY_ID}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/wishlists/add-product",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"wishlists",
+						"add-product"
+					],
+					"query": [
+						{
+							"key": "productEntryId",
+							"value": null,
+							"disabled": true
+						},
+						{
+							"key": "wishlistEntryId",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Wishlist to Customer",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "wishlistEntryId",
+							"value": "{{WISHLIST_ENTRY_ID}}",
+							"type": "text"
+						},
+						{
+							"key": "customerEntryId",
+							"value": "{{SAMPLE_CUSTOMER_ID}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/wishlists/add-wishlist-to-customer",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"wishlists",
+						"add-wishlist-to-customer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Wishlist Entry",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "entryId",
+							"value": "{{WISHLIST_ENTRY_ID}}",
+							"type": "text"
+						},
+						{
+							"key": "siteId",
+							"value": "homesquare",
+							"type": "text"
+						},
+						{
+							"key": "locale",
+							"value": "en/US",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/wishlists/update-entry",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"wishlists",
+						"update-entry"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Products",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "EP-Channel",
+						"value": "MP",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://useast.api.elasticpath.com/pcm/catalog/products?{{default_catalog_id}}",
+					"protocol": "https",
+					"host": [
+						"useast",
+						"api",
+						"elasticpath",
+						"com"
+					],
+					"path": [
+						"pcm",
+						"catalog",
+						"products"
+					],
+					"query": [
+						{
+							"key": "{{default_catalog_id}}",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

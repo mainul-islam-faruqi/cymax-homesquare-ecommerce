@@ -1,0 +1,800 @@
+{
+  "info": {
+    "_postman_id": "fcfb454a-4f2f-4500-ab08-6857f5e05478",
+    "name": "Cymax Store Setup Demo",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get client credentials token",
+      "event": [
+        {
+          "type": "text/javascript",
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json()",
+              "const d = json.hasOwnProperty(\"data\") ? json.data : json",
+              "const accessToken = Array.isArray(d) ? d[0].access_token : d.access_token",
+              "pm.environment.set(\"accessToken\", accessToken)"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json",
+            "disabled": true
+          },
+          {
+            "key": "x-moltin-auth-store",
+            "value": "{{storeID}}"
+          },
+          {
+            "key": "content-type",
+            "value": "text/plain",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "client_id",
+              "value": "{{CLIENT_ID}}",
+              "type": "text"
+            },
+            {
+              "key": "client_secret",
+              "value": "{{CLIENT_SECRET}}",
+              "type": "text"
+            },
+            {
+              "key": "grant_type",
+              "value": "client_credentials",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{API_DOMAIN}}/oauth/access_token",
+          "host": ["{{API_DOMAIN}}"],
+          "path": ["oauth", "access_token"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Wishlist Flow",
+      "event": [
+        {
+          "type": "text/javascript",
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json()",
+              "const d = json.hasOwnProperty(\"data\") ? json.data : json",
+              "const flowID = Array.isArray(d) ? d[0].id : d.id",
+              "pm.environment.set(\"wishlistFlowID\", flowID)"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-moltin-auth-store",
+            "value": "{{STORE_ID}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": {\n    \"type\": \"flow\",\n    \"name\": \"Wishlist\",\n    \"slug\": \"wishlist\",\n    \"description\": \"A wishlist of products\",\n    \"enabled\": true\n  }\n}"
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/flows",
+          "host": ["{{BASE_URL}}"],
+          "path": ["flows"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all flows",
+      "event": [
+        {
+          "type": "text/javascript",
+          "listen": "test",
+          "script": {
+            "exec": [""],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-moltin-auth-store",
+            "value": "{{PCM_URL}}"
+          }
+        ],
+        "url": {
+          "raw": "{{BASE_URL}}/flows",
+          "host": ["{{BASE_URL}}"],
+          "path": ["flows"],
+          "query": [
+            {
+              "key": "page[offset]",
+              "value": "0",
+              "disabled": true
+            },
+            {
+              "key": "page[limit]",
+              "value": "10",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Products Field on Wishlist Flow",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-moltin-auth-store",
+            "value": "{{STORE_ID}}",
+            "type": "text"
+          },
+          {
+            "key": "accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"data\": {\n        \"type\": \"field\",\n        \"name\": \"Products List\",\n        \"slug\": \"productsList\",\n        \"field_type\": \"relationship\",\n        \"validation_rules\": [{\n          \"type\": \"one-to-many\",\n          \"to\": \"product\"\n        }],\n        \"description\": \"Wishlist Products\",\n        \"required\": false,\n        \"enabled\": true,\n        \"relationships\": {\n          \"flow\": {\n            \"data\": {\n              \"type\": \"flow\",\n              \"id\": \"{{wishlistFlowID}}\"\n            }\n          }\n        }\n      }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/fields",
+          "host": ["{{BASE_URL}}"],
+          "path": ["fields"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Customer ID Field on Wishlist Flow",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-moltin-auth-store",
+            "value": "{{STORE_ID}}",
+            "type": "text"
+          },
+          {
+            "key": "accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"data\": {\n        \"type\": \"field\",\n        \"name\": \"Customer ID\",\n        \"slug\": \"customerId\",\n        \"field_type\": \"string\",\n        \"description\": \"The ID of the customer who the wishlist belongs to\",\n        \"required\": true,\n        \"enabled\": true,\n        \"relationships\": {\n          \"flow\": {\n            \"data\": {\n              \"type\": \"flow\",\n              \"id\": \"{{wishlistFlowID}}\"\n            }\n          }\n        }\n      }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/fields",
+          "host": ["{{BASE_URL}}"],
+          "path": ["fields"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all Fields on a Flow",
+      "event": [
+        {
+          "type": "text/javascript",
+          "listen": "test",
+          "script": {
+            "exec": [""],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-moltin-auth-store",
+            "value": "{{PCM_URL}}"
+          }
+        ],
+        "url": {
+          "raw": "{{BASE_URL}}/flows/wishlist/fields",
+          "host": ["{{BASE_URL}}"],
+          "path": ["flows", "wishlist", "fields"],
+          "query": [
+            {
+              "key": "page[offset]",
+              "value": "0",
+              "disabled": true
+            },
+            {
+              "key": "page[limit]",
+              "value": "10",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Wishlist Entry",
+      "event": [
+        {
+          "type": "text/javascript",
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json()",
+              "const d = json.hasOwnProperty(\"data\") ? json.data : json",
+              "const wishlistEntryID = Array.isArray(d) ? d[0].id : d.id",
+              "pm.environment.set(\"wishlistEntryID\", wishlistEntryID)"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-moltin-auth-store",
+            "value": "{{STORE_ID}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n      \"data\": {\n        \"type\": \"entry\",\n        \"customerId\": \"d82243ce-399b-4182-a3a8-15c457525996\"\n      }\n    }"
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/flows/wishlist/entries",
+          "host": ["{{BASE_URL}}"],
+          "path": ["flows", "wishlist", "entries"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Wishlists",
+      "event": [
+        {
+          "type": "text/javascript",
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json()",
+              "const d = json.hasOwnProperty(\"data\") ? json.data : json",
+              "const flowID = Array.isArray(d) ? d[0].id : d.id",
+              "pm.environment.set(\"flowID\", flowID)"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-moltin-auth-store",
+            "value": "{{STORE_ID}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": {\n    \"type\": \"flow\",\n    \"name\": \"Wishlist\",\n    \"slug\": \"wishlist\",\n    \"description\": \"A wishlist of products\",\n    \"enabled\": true\n  }\n}"
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/flows",
+          "host": ["{{BASE_URL}}"],
+          "path": ["flows"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all products",
+      "event": [
+        {
+          "type": "text/javascript",
+          "listen": "test",
+          "script": {
+            "exec": [""],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-moltin-auth-store",
+            "value": "{{PCM_URL}}"
+          }
+        ],
+        "url": {
+          "raw": "{{BASE_URL}}/products",
+          "host": ["{{BASE_URL}}"],
+          "path": ["products"],
+          "query": [
+            {
+              "key": "page[offset]",
+              "value": "0",
+              "disabled": true
+            },
+            {
+              "key": "page[limit]",
+              "value": "10",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add Product to Wishlist",
+      "event": [
+        {
+          "type": "text/javascript",
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json()",
+              "const d = json.hasOwnProperty(\"data\") ? json.data : json",
+              "const flowID = Array.isArray(d) ? d[0].id : d.id",
+              "pm.environment.set(\"flowID\", flowID)"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-moltin-auth-store",
+            "value": "{{STORE_ID}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n      \"data\": [\n        {\n            \"type\": \"product\",\n            \"id\": \"d364a565-440e-4c10-86c2-c4076ab4340d\"\n        }\n      ]\n    }"
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/flows/wishlist/entries/{{wishlistEntryID}}/relationships/productsList",
+          "host": ["{{BASE_URL}}"],
+          "path": [
+            "flows",
+            "wishlist",
+            "entries",
+            "{{wishlistEntryID}}",
+            "relationships",
+            "productsList"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Wishlists Field on Customer Flow",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-moltin-auth-store",
+            "value": "{{STORE_ID}}",
+            "type": "text"
+          },
+          {
+            "key": "accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n      \"data\": {\n        \"type\": \"field\",\n        \"name\": \"Wishlists\",\n        \"slug\": \"wishlists\",\n        \"field_type\": \"relationship\",\n        \"validation_rules\": [{\n          \"type\": \"one-to-many\",\n          \"to\": \"product\"\n        }],\n        \"description\": \"Customers wishlists\",\n        \"enabled\": true,\n        \"required\": false,\n        \"relationships\": {\n          \"flow\": {\n            \"data\": {\n              \"type\": \"flow\",\n              \"id\": {{customerFlowID}}\n            }\n          }\n        }\n      }\n    }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/fields",
+          "host": ["{{BASE_URL}}"],
+          "path": ["fields"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all Wishlist entries",
+      "event": [
+        {
+          "type": "text/javascript",
+          "listen": "test",
+          "script": {
+            "exec": [""],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-moltin-auth-store",
+            "value": "{{PCM_URL}}"
+          }
+        ],
+        "url": {
+          "raw": "{{BASE_URL}}/flows/wishlist/entries",
+          "host": ["{{BASE_URL}}"],
+          "path": ["flows", "wishlist", "entries"],
+          "query": [
+            {
+              "key": "page[offset]",
+              "value": "0",
+              "disabled": true
+            },
+            {
+              "key": "page[limit]",
+              "value": "10",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add Wishlist to Customer",
+      "event": [
+        {
+          "type": "text/javascript",
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json()",
+              "const d = json.hasOwnProperty(\"data\") ? json.data : json",
+              "const flowID = Array.isArray(d) ? d[0].id : d.id",
+              "pm.environment.set(\"flowID\", flowID)"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-moltin-auth-store",
+            "value": "{{STORE_ID}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n      \"data\": [\n        {\n            \"type\": \"wishlist\",\n            \"id\": \"{{wishlistEntryID}}\"\n        }\n      ]\n    }"
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/customers/d82243ce-399b-4182-a3a8-15c457525996/relationships/wishlists",
+          "host": ["{{BASE_URL}}"],
+          "path": [
+            "customers",
+            "d82243ce-399b-4182-a3a8-15c457525996",
+            "relationships",
+            "wishlists"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all Customer entries",
+      "event": [
+        {
+          "type": "text/javascript",
+          "listen": "test",
+          "script": {
+            "exec": [""],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "content-type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-moltin-auth-store",
+            "value": "{{PCM_URL}}"
+          }
+        ],
+        "url": {
+          "raw": "{{BASE_URL}}/flows/customers/entries",
+          "host": ["{{BASE_URL}}"],
+          "path": ["flows", "customers", "entries"],
+          "query": [
+            {
+              "key": "page[offset]",
+              "value": "0",
+              "disabled": true
+            },
+            {
+              "key": "page[limit]",
+              "value": "10",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

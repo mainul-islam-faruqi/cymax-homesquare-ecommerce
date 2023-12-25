@@ -1,0 +1,56 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# next.js
+/.next/
+.next
+/out/
+.next
+
+# production
+/build
+/dist
+
+# misc
+.DS_Store
+*.pem
+.idea
+tsconfig.tsbuildinfo
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local env files
+.env
+.env*
+!.env.local.example
+.npmrc
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+
+# Generated files
+/src/modules/chakra/theme.json
+/src/modules/chakra/fonts.json
+/src/modules/chakra/util/theme.json
+/src/modules/chakra/util/fonts.json
+/src/modules/app/siteSettings.json
+/webpack-stats-plugin.json
+/public/robots.txt
+/public/sitemap.xml
+/src/pages/api/algolia/brands.json
+/public/sitemap*
+/public/sitemap-*

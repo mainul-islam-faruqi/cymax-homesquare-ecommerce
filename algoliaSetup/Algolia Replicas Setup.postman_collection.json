@@ -1,0 +1,276 @@
+{
+	"info": {
+		"_postman_id": "ba379674-dc50-456d-bb33-60d47674c701",
+		"name": "Algolia Replicas Setup",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4437358"
+	},
+	"item": [
+		{
+			"name": "Set Virtual Replicas",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-Algolia-Application-Id",
+						"value": "{{APPLICATION_ID}}",
+						"type": "text"
+					},
+					{
+						"key": "X-Algolia-API-Key",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"replicas\": [\n      \"virtual({{INDEX}}_nameAlphabetical)\",\n      \"virtual({{INDEX}}_newest)\",\n      \"virtual({{INDEX}}_lowestPrice)\",\n      \"virtual({{INDEX}}_highestPrice)\",\n      \"virtual({{INDEX}}_mostPopular)\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{APPLICATION_ID}}{{BASE_URL_SUFFIX}}/1/indexes/{{INDEX}}/settings",
+					"protocol": "https",
+					"host": [
+						"{{APPLICATION_ID}}{{BASE_URL_SUFFIX}}"
+					],
+					"path": [
+						"1",
+						"indexes",
+						"{{INDEX}}",
+						"settings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "name ascending",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-Algolia-Application-Id",
+						"value": "{{APPLICATION_ID}}",
+						"type": "text"
+					},
+					{
+						"key": "X-Algolia-API-Key",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customRanking\": [\n      \"asc(name)\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{APPLICATION_ID}}{{BASE_URL_SUFFIX}}/1/indexes/{{INDEX}}_nameAlphabetical/settings",
+					"protocol": "https",
+					"host": [
+						"{{APPLICATION_ID}}{{BASE_URL_SUFFIX}}"
+					],
+					"path": [
+						"1",
+						"indexes",
+						"{{INDEX}}_nameAlphabetical",
+						"settings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "newest",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-Algolia-Application-Id",
+						"value": "{{APPLICATION_ID}}",
+						"type": "text"
+					},
+					{
+						"key": "X-Algolia-API-Key",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customRanking\": [\n        \"desc(created_at)\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{APPLICATION_ID}}{{BASE_URL_SUFFIX}}/1/indexes/{{INDEX}}_newest/settings",
+					"protocol": "https",
+					"host": [
+						"{{APPLICATION_ID}}{{BASE_URL_SUFFIX}}"
+					],
+					"path": [
+						"1",
+						"indexes",
+						"{{INDEX}}_newest",
+						"settings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "price ascending",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-Algolia-Application-Id",
+						"value": "{{APPLICATION_ID}}",
+						"type": "text"
+					},
+					{
+						"key": "X-Algolia-API-Key",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customRanking\": [\n        \"asc(listPrice.USD.float_price)\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{APPLICATION_ID}}{{BASE_URL_SUFFIX}}/1/indexes/{{INDEX}}_lowestPrice/settings",
+					"protocol": "https",
+					"host": [
+						"{{APPLICATION_ID}}{{BASE_URL_SUFFIX}}"
+					],
+					"path": [
+						"1",
+						"indexes",
+						"{{INDEX}}_lowestPrice",
+						"settings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "price descending",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-Algolia-Application-Id",
+						"value": "{{APPLICATION_ID}}",
+						"type": "text"
+					},
+					{
+						"key": "X-Algolia-API-Key",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customRanking\": [\n        \"desc(listPrice.USD.float_price)\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{APPLICATION_ID}}{{BASE_URL_SUFFIX}}/1/indexes/{{INDEX}}_highestPrice/settings",
+					"protocol": "https",
+					"host": [
+						"{{APPLICATION_ID}}{{BASE_URL_SUFFIX}}"
+					],
+					"path": [
+						"1",
+						"indexes",
+						"{{INDEX}}_highestPrice",
+						"settings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "popular",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-Algolia-Application-Id",
+						"value": "{{APPLICATION_ID}}",
+						"type": "text"
+					},
+					{
+						"key": "X-Algolia-API-Key",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customRanking\": [\n        \"desc(productRank)\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{APPLICATION_ID}}{{BASE_URL_SUFFIX}}/1/indexes/{{INDEX}}_mostPopular/settings",
+					"protocol": "https",
+					"host": [
+						"{{APPLICATION_ID}}{{BASE_URL_SUFFIX}}"
+					],
+					"path": [
+						"1",
+						"indexes",
+						"{{INDEX}}_mostPopular",
+						"settings"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

@@ -1,0 +1,541 @@
+{
+	"info": {
+		"_postman_id": "27b048a1-072d-4b47-b909-ddc28a27befe",
+		"name": "EPCC OIDC PoC",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15480237"
+	},
+	"item": [
+		{
+			"name": "Get implicit token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Get accessToken', function (){",
+							"    const json = pm.response.json()",
+							"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+							"    const accessToken = Array.isArray(d) ? d[0].access_token : d.access_token",
+							"    pm.collectionVariables.set(\"ACCESS_TOKEN\", accessToken)",
+							"    pm.collectionVariables.set('ACCESS_TOKEN_EXPIRES', json.expires)",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-moltin-auth-store",
+						"value": "{{STORE_ID}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "{{CLIENT_ID}}",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "implicit",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{API_DOMAIN}}/oauth/access_token",
+					"host": [
+						"{{API_DOMAIN}}"
+					],
+					"path": [
+						"oauth",
+						"access_token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get customer authentication realm",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test(\"JSON return is valid\", function () {",
+							"    pm.expect(jsonData.data).to.be.an('object', \"Data is not an Object\");",
+							"    const customerRealm = jsonData.data.relationships['authentication-realm'].data",
+							"    // console.log(customerRealm)",
+							"    pm.collectionVariables.set('CUSTOMER_AUTH_REALM_ID', customerRealm.id)",
+							"    pm.collectionVariables.set('OIDC_CLIENT_ID', jsonData.data.meta.client_id)",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_DOMAIN}}/v2/settings/customer-authentication/",
+					"host": [
+						"{{API_DOMAIN}}"
+					],
+					"path": [
+						"v2",
+						"settings",
+						"customer-authentication",
+						""
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "List Authentication Realms Copy",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_DOMAIN}}/v2/settings/customer-authentication/",
+							"host": [
+								"{{API_DOMAIN}}"
+							],
+							"path": [
+								"v2",
+								"settings",
+								"customer-authentication",
+								""
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "content-type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "content-encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "x-envoy-upstream-service-time",
+							"value": "17"
+						},
+						{
+							"key": "x-request-id",
+							"value": "5089379a-1df8-4a66-9f1f-85f75156c663"
+						},
+						{
+							"key": "Accept-Ranges",
+							"value": "bytes"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 09 Nov 2022 15:39:41 GMT"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 varnish"
+						},
+						{
+							"key": "X-Served-By",
+							"value": "cache-yyz4570-YYZ"
+						},
+						{
+							"key": "X-Cache",
+							"value": "MISS"
+						},
+						{
+							"key": "X-Cache-Hits",
+							"value": "0"
+						},
+						{
+							"key": "X-Timer",
+							"value": "S1668008381.226796,VS0,VE102"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Strict-Transport-Security",
+							"value": "max-age=31557600"
+						},
+						{
+							"key": "transfer-encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"id\": \"4e10ea97-a128-46d3-b8d1-8a48b7818296\",\n        \"type\": \"customer-authentication-settings\",\n        \"relationships\": {\n            \"authentication-realm\": {\n                \"data\": {\n                    \"type\": \"authentication-realm\",\n                    \"id\": \"de21ed06-d6bb-427b-a587-791906c08626\",\n                    \"links\": {\n                        \"self\": \"https://useast.api.elasticpath.com/v2/authentication-realms/de21ed06-d6bb-427b-a587-791906c08626\"\n                    }\n                }\n            }\n        },\n        \"meta\": {\n            \"client_id\": \"customers\"\n        }\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Get the list of configured single sign-on providers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Grab data\", function () {",
+							"    pm.expect(jsonData.data).to.be.an('array', 'Data is not an array')",
+							"    pm.collectionVariables.set('OIDC_AUTH_URL', jsonData.data[0].links[\"authorization-endpoint\"])",
+							"    pm.collectionVariables.set('OIDC_ISSUER_URL', jsonData.data[0].meta[\"issuer\"])",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "{{API_DOMAIN}}/v2/authentication-realms/:realm-id/oidc-profiles",
+					"host": [
+						"{{API_DOMAIN}}"
+					],
+					"path": [
+						"v2",
+						"authentication-realms",
+						":realm-id",
+						"oidc-profiles"
+					],
+					"variable": [
+						{
+							"key": "realm-id",
+							"value": "{{CUSTOMER_AUTH_REALM_ID}}"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get the list of configured single sign-on providers",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer XXXX"
+							}
+						],
+						"url": {
+							"raw": "{{API_DOMAIN}}/v2/authentication-realms/:realm-id/oidc-profiles",
+							"host": [
+								"{{API_DOMAIN}}"
+							],
+							"path": [
+								"v2",
+								"authentication-realms",
+								":realm-id",
+								"oidc-profiles"
+							],
+							"variable": [
+								{
+									"key": "realm-id",
+									"value": "{{CUSTOMER_AUTH_REALM_ID}}"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "content-type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "content-encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "x-envoy-upstream-service-time",
+							"value": "21"
+						},
+						{
+							"key": "x-request-id",
+							"value": "6d64e33b-cebe-4d73-aece-1a15b0eee859"
+						},
+						{
+							"key": "Accept-Ranges",
+							"value": "bytes"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 09 Nov 2022 15:27:03 GMT"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 varnish"
+						},
+						{
+							"key": "X-Served-By",
+							"value": "cache-yyz4537-YYZ"
+						},
+						{
+							"key": "X-Cache",
+							"value": "MISS"
+						},
+						{
+							"key": "X-Cache-Hits",
+							"value": "0"
+						},
+						{
+							"key": "X-Timer",
+							"value": "S1668007623.250646,VS0,VE43"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Strict-Transport-Security",
+							"value": "max-age=31557600"
+						},
+						{
+							"key": "transfer-encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"meta\": {\n        \"page\": {\n            \"limit\": 25,\n            \"offset\": 0,\n            \"current\": 1,\n            \"total\": 1\n        },\n        \"results\": {\n            \"total\": 1\n        }\n    },\n    \"data\": [\n        {\n            \"links\": {\n                \"callback-endpoint\": \"https://useast.api.elasticpath.com/oidc-idp/callback/stores/4e10ea97-a128-46d3-b8d1-8a48b7818296/authentication-realms/de21ed06-d6bb-427b-a587-791906c08626/oidc-profiles/f05643d8-e1eb-44e1-a659-43b7abe20b93\",\n                \"self\": \"https://useast.api.elasticpath.com/v2/authentication-realms/de21ed06-d6bb-427b-a587-791906c08626/oidc-profiles/f05643d8-e1eb-44e1-a659-43b7abe20b93\",\n                \"authorization-endpoint\": \"https://useast.api.elasticpath.com/oidc-idp/login/stores/4e10ea97-a128-46d3-b8d1-8a48b7818296/authentication-realms/de21ed06-d6bb-427b-a587-791906c08626?elasticpath_commerce_cloud_profile_id=f05643d8-e1eb-44e1-a659-43b7abe20b93\",\n                \"client-discovery-url\": \"https://useast.api.elasticpath.com/oidc-idp/stores/4e10ea97-a128-46d3-b8d1-8a48b7818296/authentication-realms/de21ed06-d6bb-427b-a587-791906c08626/.well-known/openid-configuration\"\n            },\n            \"id\": \"f05643d8-e1eb-44e1-a659-43b7abe20b93\",\n            \"name\": \"Okta\",\n            \"meta\": {\n                \"issuer\": \"https://dev-41344551.okta.com/oauth2/default\",\n                \"created_at\": \"2022-11-03T14:20:34.797Z\",\n                \"updated_at\": \"2022-11-03T14:20:34.797Z\"\n            },\n            \"type\": \"oidc-profile\",\n            \"discovery_url\": \"https://dev-41344551.okta.com/oauth2/default/.well-known/openid-configuration?client_id=0oa748wfvxxabDeO55d7\",\n            \"client_id\": \"0oa748wfvxxabDeO55d7\"\n        }\n    ],\n    \"links\": {\n        \"next\": null,\n        \"current\": \"https://useast.api.elasticpath.com/v2/authentication-realms/de21ed06-d6bb-427b-a587-791906c08626/oidc-profiles?page%5Boffset%5D=0&page%5Blimit%5D=25\",\n        \"last\": \"https://useast.api.elasticpath.com/v2/authentication-realms/de21ed06-d6bb-427b-a587-791906c08626/oidc-profiles?page%5Boffset%5D=0&page%5Blimit%5D=25\",\n        \"prev\": null,\n        \"first\": \"https://useast.api.elasticpath.com/v2/authentication-realms/de21ed06-d6bb-427b-a587-791906c08626/oidc-profiles?page%5Boffset%5D=0&page%5Blimit%5D=25\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Redirect user to SSO",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{OIDC_AUTH_URL}}?scope=openid email profile&response_type=code&client_id={{OIDC_CLIENT_ID}}&redirect_uri={{APP_URL}}/account/oidc&state=qwertyuiop&code_challenge_method=S256&code_challenge=9a900403ac313ba27a1bc81f0932652b8020dac92c234d98fa0b06bf0040ecfd",
+					"host": [
+						"{{OIDC_AUTH_URL}}"
+					],
+					"query": [
+						{
+							"key": "scope",
+							"value": "openid email profile",
+							"description": "hardcoded value"
+						},
+						{
+							"key": "response_type",
+							"value": "code",
+							"description": "hardcoded value"
+						},
+						{
+							"key": "client_id",
+							"value": "{{OIDC_CLIENT_ID}}",
+							"description": "retrieve from previous step"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "{{APP_URL}}/account/oidc",
+							"description": "URL SSO will call after user logs in"
+						},
+						{
+							"key": "state",
+							"value": "qwertyuiop",
+							"description": "random value"
+						},
+						{
+							"key": "code_challenge_method",
+							"value": "S256",
+							"description": "hardcoded method required by EP"
+						},
+						{
+							"key": "code_challenge",
+							"value": "9a900403ac313ba27a1bc81f0932652b8020dac92c234d98fa0b06bf0040ecfd",
+							"description": "sha-256 of the \"state\". Base64 encoded and URL friendly https://github.com/elasticpath/epcc-react-pwa-reference-storefront/blob/master/src/LoginDialog/PkceUtilities.ts"
+						},
+						{
+							"key": "display",
+							"value": "???",
+							"description": "Provider options",
+							"disabled": true
+						},
+						{
+							"key": "prompt",
+							"value": "???",
+							"description": "Provider options",
+							"disabled": true
+						},
+						{
+							"key": "ui_locales",
+							"value": "???",
+							"description": "Provider options",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get customer token from SSO data",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"token\",\n        \"authentication_mechanism\": \"oidc\",\n        \"oauth_authorization_code\": \"<code received from SSO provider>\",\n        \"oauth_redirect_uri\": \"<URL to redirect the user to?>\",\n        \"oauth_code_verifier\": \"<code verifier from previous steps or SSO provider>\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_DOMAIN}}/v2/customers/tokens",
+					"host": [
+						"{{API_DOMAIN}}"
+					],
+					"path": [
+						"v2",
+						"customers",
+						"tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{OIDC_ISSUER_URL}}/v2/logout?client_id={{OIDC_CLIENT_ID}}&returnTo={{APP_URL}}",
+					"host": [
+						"{{OIDC_ISSUER_URL}}"
+					],
+					"path": [
+						"v2",
+						"logout"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "{{OIDC_CLIENT_ID}}",
+							"description": "retrieve from previous step"
+						},
+						{
+							"key": "returnTo",
+							"value": "{{APP_URL}}",
+							"description": "URL to return after logout"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{ACCESS_TOKEN}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "ACCESS_TOKEN",
+			"value": "be92f15aacb6b6e4ffc8fc3f329fcfaa98e1efc3"
+		},
+		{
+			"key": "ACCESS_TOKEN_EXPIRES",
+			"value": 1671547378
+		},
+		{
+			"key": "CUSTOMER_AUTH_REALM_ID",
+			"value": "06cd16ad-9b66-44fc-8ca1-5b522834f631"
+		},
+		{
+			"key": "OIDC_AUTH_URL",
+			"value": "https://useast.api.elasticpath.com/oidc-idp/login/stores/a8e393d1-8be4-430c-b547-b8b360031c04/authentication-realms/06cd16ad-9b66-44fc-8ca1-5b522834f631?elasticpath_commerce_cloud_profile_id=517036af-1ad8-4263-b73a-07a10bca9bd3"
+		},
+		{
+			"key": "OIDC_CLIENT_ID",
+			"value": "customers"
+		},
+		{
+			"key": "APP_URL",
+			"value": "https://cymax-dev.vercel.app"
+		},
+		{
+			"key": "OIDC_ISSUER_URL",
+			"value": "https://cymax.us.auth0.com/",
+			"type": "string"
+		}
+	]
+}

@@ -1,0 +1,1229 @@
+{
+	"info": {
+		"_postman_id": "01b3a914-0974-4772-9a29-81064e344f35",
+		"name": "Cymax store setup",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4437358"
+	},
+	"item": [
+		{
+			"name": "Setup",
+			"item": [
+				{
+					"name": "Get client credentials token Copy",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json()",
+									"const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"const accessToken = Array.isArray(d) ? d[0].access_token : d.access_token",
+									"pm.collectionVariables.set(\"_accessToken\", accessToken);",
+									"",
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"});",
+									"",
+									"pm.test(\"Collection variable test\", function () {",
+									"    pm.collectionVariables.get(\"_accessToken\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{CLIENT_ID}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{CLIENT_SECRET}}",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/oauth/access_token",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"oauth",
+								"access_token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get orders flow",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"});",
+									"",
+									"pm.test(\"Order flow exist\", function () {",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    const ordersFlow = d.find((flow) => flow.slug === 'orders')",
+									"    if (ordersFlow != null) {",
+									"        pm.collectionVariables.set('_ordersFlowId', ordersFlow.id)",
+									"        postman.setNextRequest(\"Get forter_response field\")",
+									"    }",
+									"    pm.expect(ordersFlow).not.null.and.not.undefined",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/v2/flows",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"flows"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add orders flow",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    pm.expect(d).to.haveOwnProperty('id')",
+									"    pm.collectionVariables.set('_ordersFlowId', d.id)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"flow\",\n        \"slug\": \"orders\",\n        \"name\": \"Orders\",\n        \"description\": \"Extended order fields\",\n        \"enabled\": true\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v2/flows",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"flows"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get forter_response field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"});",
+									"",
+									"pm.test(\"Field exist\", function () {",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    const forterResponse = d.find((field) => field.slug === 'forter_response' && field.relationships.flow.data.id === pm.collectionVariables.get('_ordersFlowId'))",
+									"    if (forterResponse != null) {",
+									"        postman.setNextRequest(\"Get payment_method field\")",
+									"    }",
+									"    pm.expect(forterResponse).not.null.and.not.undefined",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add forter_response field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    pm.expect(d).to.haveOwnProperty('id')",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"field\",\n        \"slug\": \"forter_response\",\n        \"name\": \"Forter Response\",\n        \"field_type\": \"string\",\n        \"description\": \"Field to store forter response\",\n        \"required\": false,\n        \"enabled\": true,\n        \"relationships\":{\n            \"flow\": {\n                \"data\": {\n                    \"type\": \"flow\",\n                    \"id\": \"{{_ordersFlowId}}\"\n                }\n            }\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get payment_method field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"});",
+									"",
+									"pm.test(\"Field exist\", function () {",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    const forterResponse = d.find((field) => field.slug === 'payment_method' && field.relationships.flow.data.id === pm.collectionVariables.get('_ordersFlowId'))",
+									"    if (forterResponse != null) {",
+									"        postman.setNextRequest(\"Get referral field\")",
+									"    }",
+									"    pm.expect(forterResponse).not.null.and.not.undefined",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add payment_method field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.success",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    pm.expect(d).to.haveOwnProperty('id')",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"field\",\n        \"slug\": \"payment_method\",\n        \"name\": \"Payment Method\",\n        \"field_type\": \"string\",\n        \"description\": \"Name of the payment method selected by the user\",\n        \"required\": false,\n        \"enabled\": true,\n        \"relationships\":{\n            \"flow\": {\n                \"data\": {\n                    \"type\": \"flow\",\n                    \"id\": \"{{_ordersFlowId}}\"\n                }\n            }\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get referral field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"});",
+									"",
+									"pm.test(\"Field exist\", function () {",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    const forterResponse = d.find((field) => field.slug === 'referral' && field.relationships.flow.data.id === pm.collectionVariables.get('_ordersFlowId'))",
+									"    if (forterResponse != null) {",
+									"        postman.setNextRequest(\"Get isCSA field\")",
+									"    }",
+									"    pm.expect(forterResponse).not.null",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add referral field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.success",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    pm.expect(d).to.haveOwnProperty('id')",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"field\",\n        \"slug\": \"referral\",\n        \"name\": \"Referral\",\n        \"field_type\": \"string\",\n        \"description\": \"Referrer Tracking\",\n        \"required\": false,\n        \"enabled\": true,\n        \"relationships\":{\n            \"flow\": {\n                \"data\": {\n                    \"type\": \"flow\",\n                    \"id\": \"{{_ordersFlowId}}\"\n                }\n            }\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get isCSA field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"});",
+									"",
+									"pm.test(\"Field exist\", function () {",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    const forterResponse = d.find((field) => field.slug === 'isCSA' && field.relationships.flow.data.id === pm.collectionVariables.get('_ordersFlowId'))",
+									"    if (forterResponse != null) {",
+									"        postman.setNextRequest(\"Get customers flow\")",
+									"    }",
+									"    pm.expect(forterResponse).not.null",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add isCSA field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.success;",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    pm.expect(d).to.haveOwnProperty('id')",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"field\",\n        \"slug\": \"isCSA\",\n        \"name\": \"Customer Service Agent\",\n        \"field_type\": \"boolean\",\n        \"description\": \"True if the order was made by a CSA profile\",\n        \"required\": false,\n        \"default\": false,\n        \"enabled\": true,\n        \"relationships\":{\n            \"flow\": {\n                \"data\": {\n                    \"type\": \"flow\",\n                    \"id\": \"{{_ordersFlowId}}\"\n                }\n            }\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get customers flow",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"});",
+									"",
+									"pm.test(\"Customer flow exist\", function () {",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    const customersFlow = d.find((flow) => flow.slug === 'customers')",
+									"    if (customersFlow != null) {",
+									"        pm.collectionVariables.set('_customersFlowID', customersFlow.id)",
+									"        postman.setNextRequest(\"Get resetToken field\")",
+									"    }",
+									"    pm.expect(customersFlow).not.null.and.not.undefined",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/v2/flows",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"flows"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add customers flow",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    pm.expect(d).to.haveOwnProperty('id')",
+									"    pm.collectionVariables.set('_customersFlowID', d.id)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"flow\",\n        \"slug\": \"customers\",\n        \"name\": \"Customers\",\n        \"description\": \"Extended customer fields\",\n        \"enabled\": true\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v2/flows",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"flows"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get resetToken field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"});",
+									"",
+									"pm.test(\"Field exist\", function () {",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    const fieldObj = d.find((field) => field.slug === 'resetToken' && field.relationships.flow.data.id === pm.collectionVariables.get('_customersFlowID'))",
+									"    if (fieldObj != null) {",
+									"        postman.setNextRequest(\"Get isCSA field\")",
+									"    }",
+									"    pm.expect(fieldObj).not.null.and.not.undefined",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add resetToken field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    pm.expect(d).to.haveOwnProperty('id')",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"field\",\n        \"slug\": \"resetToken\",\n        \"name\": \"Reset Token\",\n        \"field_type\": \"string\",\n        \"description\": \"Token issued to a user to reset his/her password\",\n        \"required\": false,\n        \"enabled\": true,\n        \"relationships\":{\n            \"flow\": {\n                \"data\": {\n                    \"type\": \"flow\",\n                    \"id\": \"{{_customersFlowID}}\"\n                }\n            }\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get isCSA field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"});",
+									"",
+									"pm.test(\"Field exist\", function () {",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    const fieldObj = d.find((field) => field.slug === 'isCSA' && field.relationships.flow.data.id === pm.collectionVariables.get('_customersFlowID'))",
+									"    if (fieldObj != null) {",
+									"        postman.setNextRequest(\"Get addresses flow\")",
+									"    }",
+									"    pm.expect(fieldObj).not.null.and.not.undefined",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add isCSA field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    pm.expect(d).to.haveOwnProperty('id')",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"field\",\n        \"slug\": \"isCSA\",\n        \"name\": \"Customer Service Agent\",\n        \"field_type\": \"boolean\",\n        \"description\": \"attribute to indicate that an account is a customer service agent\",\n        \"required\": false,\n        \"enabled\": true,\n        \"default\": false,\n        \"relationships\":{\n            \"flow\": {\n                \"data\": {\n                    \"type\": \"flow\",\n                    \"id\": \"{{_customersFlowID}}\"\n                }\n            }\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get addresses flow",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"});",
+									"",
+									"pm.test(\"Customer flow exist\", function () {",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    const flowObj = d.find((flow) => flow.slug === 'addresses')",
+									"    if (flowObj != null) {",
+									"        pm.collectionVariables.set('_addressesFlowID', flowObj.id)",
+									"        postman.setNextRequest(\"Get isCommercial field\")",
+									"    }",
+									"    pm.expect(flowObj).not.null.and.not.undefined",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/v2/flows",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"flows"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add addresses flow",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    pm.expect(d).to.haveOwnProperty('id')",
+									"    pm.collectionVariables.set('_customersFlowID', d.id)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"flow\",\n        \"slug\": \"addresses\",\n        \"name\": \"Addresses\",\n        \"description\": \"Extended fields for addresses\",\n        \"enabled\": true\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v2/flows",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"flows"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get isCommercial field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"});",
+									"",
+									"pm.test(\"Field exist\", function () {",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    const fieldObj = d.find((field) => field.slug === 'isCommercial' && field.relationships.flow.data.id === pm.collectionVariables.get('_addressesFlowID'))",
+									"    if (fieldObj != null) {",
+									"        postman.setNextRequest(\"Get industry field\")",
+									"    }",
+									"    pm.expect(fieldObj).not.null.and.not.undefined",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add isCommercial field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    pm.expect(d).to.haveOwnProperty('id')",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"field\",\n        \"slug\": \"isCommercial\",\n        \"name\": \"Is Commercial\",\n        \"field_type\": \"boolean\",\n        \"description\": \"True if the address is commercial and false it's residential\",\n        \"required\": false,\n        \"enabled\": true,\n        \"default\": false,\n        \"relationships\":{\n            \"flow\": {\n                \"data\": {\n                    \"type\": \"flow\",\n                    \"id\": \"{{_addressesFlowID}}\"\n                }\n            }\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get industry field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"});",
+									"",
+									"pm.test(\"Field exist\", function () {",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    const fieldObj = d.find((field) => field.slug === 'industry' && field.relationships.flow.data.id === pm.collectionVariables.get('_addressesFlowID'))",
+									"    if (fieldObj != null) {",
+									"        postman.setNextRequest(null)",
+									"    }",
+									"    pm.expect(fieldObj).not.null.and.not.undefined",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add industry field",
+					"event": [
+						{
+							"type": "text/javascript",
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status test\", function () {",
+									"    pm.response.to.be.ok;",
+									"    const json = pm.response.json()",
+									"    const d = json.hasOwnProperty(\"data\") ? json.data : json",
+									"    pm.expect(d).to.haveOwnProperty('id')",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "text/plain",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"field\",\n        \"slug\": \"industry\",\n        \"name\": \"Industry\",\n        \"field_type\": \"string\",\n        \"description\": \"Industry field\",\n        \"required\": false,\n        \"enabled\": true,\n        \"relationships\":{\n            \"flow\": {\n                \"data\": {\n                    \"type\": \"flow\",\n                    \"id\": \"{{_addressesFlowID}}\"\n                }\n            }\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v2/fields",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v2",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{_accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "_accessToken",
+			"value": ""
+		},
+		{
+			"key": "_ordersFlowId",
+			"value": ""
+		},
+		{
+			"key": "_customersFlow",
+			"value": ""
+		},
+		{
+			"key": "_customersFlowID",
+			"value": ""
+		},
+		{
+			"key": "_addressesFlowID",
+			"value": ""
+		}
+	]
+}

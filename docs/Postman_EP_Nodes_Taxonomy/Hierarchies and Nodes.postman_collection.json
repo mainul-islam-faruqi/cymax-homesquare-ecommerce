@@ -1,0 +1,259 @@
+{
+	"info": {
+		"_postman_id": "d8b5aba8-5203-4aca-986a-e7a0c4841a98",
+		"name": "Hierarchies and Nodes",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get client credentials token",
+			"event": [
+				{
+					"type": "text/javascript",
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const json = pm.response.json()",
+							"const d = json.hasOwnProperty(\"data\") ? json.data : json",
+							"const accessToken = Array.isArray(d) ? d[0].access_token : d.access_token",
+							"pm.environment.set(\"accessToken\", accessToken)",
+							"",
+							"pm.test(\"Status test\", function () {",
+							"    pm.response.to.be.ok;",
+							"});",
+							"",
+							"pm.test(\"Environment variable test\", function () {",
+							"    pm.expect(pm.environment.get(\"accessToken\")).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "content-type",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "x-moltin-auth-store",
+						"value": "{{STORE_ID}}"
+					},
+					{
+						"key": "content-type",
+						"value": "text/plain",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "{{CLIENT_ID}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{CLIENT_SECRET}}",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{API_DOMAIN}}/oauth/access_token",
+					"host": [
+						"{{API_DOMAIN}}"
+					],
+					"path": [
+						"oauth",
+						"access_token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all Hierarchies",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_DOMAIN}}/catalog/hierarchies",
+					"host": [
+						"{{API_DOMAIN}}"
+					],
+					"path": [
+						"catalog",
+						"hierarchies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all Collections",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_DOMAIN}}/catalog/hierarchies",
+					"host": [
+						"{{API_DOMAIN}}"
+					],
+					"path": [
+						"catalog",
+						"hierarchies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Outdoor Hierarchy",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_DOMAIN}}/catalog/hierarchies/98e82a22-c203-4579-84b1-541b02fedd4b",
+					"host": [
+						"{{API_DOMAIN}}"
+					],
+					"path": [
+						"catalog",
+						"hierarchies",
+						"98e82a22-c203-4579-84b1-541b02fedd4b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Outdoor Hierarchy Nodes",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_DOMAIN}}/catalog/hierarchies/98e82a22-c203-4579-84b1-541b02fedd4b/nodes",
+					"host": [
+						"{{API_DOMAIN}}"
+					],
+					"path": [
+						"catalog",
+						"hierarchies",
+						"98e82a22-c203-4579-84b1-541b02fedd4b",
+						"nodes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Nodes",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "EP-Channel",
+						"value": "MP",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{API_DOMAIN}}/catalog/nodes",
+					"host": [
+						"{{API_DOMAIN}}"
+					],
+					"path": [
+						"catalog",
+						"nodes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local get nodes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/taxonomy/get-all-nodes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"taxonomy",
+						"get-all-nodes"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

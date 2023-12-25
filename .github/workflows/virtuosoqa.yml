@@ -1,0 +1,19 @@
+name: VirtuosoQA
+
+on:
+  pull_request_target:
+    types:
+      - closed
+    branches:
+      - 'main'
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Virtuoso execution plan
+        run: | 
+          curl --fail --request POST --header "Authorization: Bearer $AUTH_TOKEN" --url "https://api.virtuoso.qa/api/plans/executions/${{secrets.VIRTUOSO_PLAN_ID}}/execute"
+        env:
+          AUTH_TOKEN: ${{ secrets.VIRTUOSO_AUTH_TOKEN }}

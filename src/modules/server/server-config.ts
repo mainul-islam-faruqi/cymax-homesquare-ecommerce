@@ -1,0 +1,2 @@
+export const ELASTIC_PATH_CLIENT_SECRET =
+  process.env.ELASTIC_PATH_CLIENT_SECRET || ''

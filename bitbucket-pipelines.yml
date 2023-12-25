@@ -1,0 +1,24 @@
+image: node:16
+
+pipelines:
+  default:
+    - step:
+        name: Run Checks
+        caches: 
+          - node
+        script:
+          - echo @myplanetdigital:registry=https://registry.npmjs.org/ >> ~/.npmrc
+          - echo //registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN} >> ~/.npmrc
+          - yarn install --frozen-lockfile
+          - yarn prebuild
+          - yarn ts
+          - yarn lint
+          - yarn csslint
+          - BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+          - >-
+            if [ "$BRANCH_NAME" = "staging" ];
+            then curl --location --request POST https://api.virtuoso.qa/api/plans/executions/$VIRTUOSO_STAGING_PLAN_ID/execute --header 'Authorization: Bearer '"$VIRTUOSO_AUTH_TOKEN"''; fi
+          - >-
+            if [ "$BRANCH_NAME" = "production" ];
+            then curl --location --request POST https://api.virtuoso.qa/api/plans/executions/$VIRTUOSO_PRODUCTION_PLAN_ID/execute --header 'Authorization: Bearer '"$VIRTUOSO_AUTH_TOKEN"''; fi
+
