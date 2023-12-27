@@ -145,6 +145,29 @@ export const InnerProductListingPage = ({
     handleViewItemList(hits)
   }, [hits?.length])
 
+  
+  useEffect(() => {
+    
+    function updateScroll() {
+      sessionStorage.setItem('scrollPosition', window.scrollY.toString())
+    }
+
+    // restoring scroll position if any from session storage
+    const scrollPosition = sessionStorage.getItem('scrollPosition')
+
+    if (hits.length > 0 && scrollPosition) {
+      window.scrollTo(0, parseInt(scrollPosition))
+      sessionStorage.removeItem('scrollPosition')
+    } else {
+      // Attach scroll event listener on window
+      window.addEventListener('scroll', updateScroll)
+    }
+
+    return () => {
+      // Remove the event listener when the component is unmounted.
+      window.removeEventListener('scroll', updateScroll)
+    }
+  }, [hits])
 
   return (
     <>
