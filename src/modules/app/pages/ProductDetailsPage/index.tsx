@@ -176,6 +176,13 @@ export const ProductDetailsPage = ({
   })
 
   useEffect(() => {
+    window.addEventListener('popstate', (event) => {
+      event.preventDefault()
+      router.push(event.state.url)
+    })
+  }, [])
+
+  useEffect(() => {
     if (minQty) {
       setQuantity(minQty)
     }

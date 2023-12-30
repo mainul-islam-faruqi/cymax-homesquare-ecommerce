@@ -146,28 +146,33 @@ export const InnerProductListingPage = ({
   }, [hits?.length])
 
   
-  useEffect(() => {
-    
+  useCallback(() => {
+    const scrollPositionKey = router.asPath
     function updateScroll() {
-      sessionStorage.setItem('scrollPosition', window.scrollY.toString())
+      sessionStorage.setItem(scrollPositionKey, window.scrollY.toString())
     }
 
     // restoring scroll position if any from session storage
-    const scrollPosition = sessionStorage.getItem('scrollPosition')
+    const scrollPosition = sessionStorage.getItem(scrollPositionKey)
 
     if (hits.length > 0 && scrollPosition) {
-      window.scrollTo(0, parseInt(scrollPosition))
-      sessionStorage.removeItem('scrollPosition')
-    } else {
-      // Attach scroll event listener on window
-      window.addEventListener('scroll', updateScroll)
-    }
+      requestAnimationFrame(() => {
+        window.scrollTo(0, parseInt(scrollPosition))
+      })
 
+      console.log('window.scrollY', window.scrollY)
+    }
+    window.addEventListener('scroll', updateScroll)
+    const removeEventListeners = () => {
+      window.removeEventListener('scroll', updateScroll)
+    }
+    router.events.on('routeChangeStart', removeEventListeners)
     return () => {
       // Remove the event listener when the component is unmounted.
       window.removeEventListener('scroll', updateScroll)
+      router.events.off('routeChangeStart', removeEventListeners)
     }
-  }, [hits])
+  }, [hits, router.asPath, router.events])
 
   return (
     <>
