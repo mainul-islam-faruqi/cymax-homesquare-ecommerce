@@ -20,7 +20,13 @@ import { Items } from '@modules/gtm/search/types'
 import _find from 'lodash/find'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from 'react'
 import {
   useInfiniteHits,
   useInstantSearch,
@@ -61,6 +67,8 @@ export const InnerProductListingPage = ({
   ctfEntry,
 }: ProductListingPageProps & { algoliaIndex: string }) => {
   const router = useRouter()
+  const [scrollPosition, setScrollPosition] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
   const searchQuery = query.query ?? ''
   const intl = useIntl()
   const categoryName = _find(
@@ -145,34 +153,33 @@ export const InnerProductListingPage = ({
     handleViewItemList(hits)
   }, [hits?.length])
 
-  
-  useCallback(() => {
+  useLayoutEffect(() => {
     const scrollPositionKey = router.asPath
+
     function updateScroll() {
       sessionStorage.setItem(scrollPositionKey, window.scrollY.toString())
     }
 
     // restoring scroll position if any from session storage
-    const scrollPosition = sessionStorage.getItem(scrollPositionKey)
-
-    if (hits.length > 0 && scrollPosition) {
-      requestAnimationFrame(() => {
+    if (areResultsReady) {
+      const scrollPosition = sessionStorage.getItem(scrollPositionKey)
+      if (scrollPosition) {
         window.scrollTo(0, parseInt(scrollPosition))
-      })
-
-      console.log('window.scrollY', window.scrollY)
+      }
+      window.addEventListener('scroll', updateScroll)
     }
-    window.addEventListener('scroll', updateScroll)
+
     const removeEventListeners = () => {
       window.removeEventListener('scroll', updateScroll)
     }
     router.events.on('routeChangeStart', removeEventListeners)
+
     return () => {
       // Remove the event listener when the component is unmounted.
-      window.removeEventListener('scroll', updateScroll)
+      removeEventListeners()
       router.events.off('routeChangeStart', removeEventListeners)
     }
-  }, [hits, router.asPath, router.events])
+  }, [areResultsReady, router?.asPath, router?.events])
 
   return (
     <>
@@ -300,12 +307,7 @@ export const InnerProductListingPage = ({
               </SimpleGrid>
             )}
             {hits.length > 0 && (
-              <Box
-                id="productListDiv"
-                opacity={!areResultsReady ? 0 : 1}
-                mt={{ base: 8, lg: 10 }}
-                w="full"
-              >
+              <Box opacity={!areResultsReady ? 0 : 1} mt={{ base: 8, lg: 10 }}>
                 <InfiniteHits />
               </Box>
             )}
