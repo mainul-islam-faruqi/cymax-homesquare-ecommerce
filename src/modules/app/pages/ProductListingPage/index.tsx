@@ -70,6 +70,11 @@ export const ProductListingPage = ({
     ecomm_pcat: isSearchPage ? `search-${query}` : 'category',
   })
 
+  console.log('query', query)
+  console.log('slug', slug)
+  let filters = routePattern?.facetsToApply?.join(' AND ') ?? ''
+  console.log("filters", filters)
+  
   return (
     <>
       <Script

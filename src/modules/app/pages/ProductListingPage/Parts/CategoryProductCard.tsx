@@ -14,6 +14,7 @@ import { useIntl } from 'react-intl'
 import { useCsa } from '../../CsaLoginPage/hooks'
 
 export type MyAlgoliaProduct = AlgoliaProduct & {
+  slug: string,
   sku: string
   listPrice: {
     USD: {

@@ -147,6 +147,10 @@ export const InnerProductListingPage = ({
       },
     })
   }, [])
+  
+  const handleShowMore = () => {
+    sessionStorage.setItem('tt_pixel_session_index', JSON.stringify({index:1}))
+  }
 
   useEffect(() => {
     if (!hits?.length) return
@@ -180,7 +184,7 @@ export const InnerProductListingPage = ({
       router.events.off('routeChangeStart', removeEventListeners)
     }
   }, [areResultsReady, router?.asPath, router?.events])
-
+  console.log('searchQuery', searchQuery)
   return (
     <>
       <NextSeo
