@@ -6,6 +6,8 @@ import { useEffect } from 'react'
 export const useAuthGuard = () => {
   const router = useRouter()
   const currentRoute = router.pathname
+  console.log(currentRoute, 'currentRoute')
+  console.log('router', router)
   const { customer, isLoading } = useUser()
 
   useEffect(() => {

@@ -42,6 +42,7 @@ export const AccountLayoutPage: React.FC<AccountLayoutPageProps> = ({
   if (!isAuth) {
     return null
   }
+  console.log(router, 'router')
 
   return (
     <Box
