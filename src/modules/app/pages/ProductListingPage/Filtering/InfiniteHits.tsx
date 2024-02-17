@@ -144,7 +144,7 @@ export const InfiniteHits = (props: InfiniteHitsProps) => {
           setIsShowMore(false)
         } else if (!isShowMore && page && page + 1 === hits.length / 24) {
           console.log(hits.length, page + 1, 'hits page + 1')
-          console.log(nbHits, page, '!isShowMore nbHits page')
+          
           setAllProducts([...hits])
         } else if (router.query.page && Object.keys(router.query).length > 2) {
           setAllProducts([...hits])
