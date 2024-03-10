@@ -518,7 +518,7 @@
 		},
 		{
 			"key": "CUSTOMER_AUTH_REALM_ID",
-			"value": "06cd16ad-9b66-44fc-8ca1-5b522834f631"
+			"value": ""
 		},
 		{
 			"key": "OIDC_AUTH_URL",
